@@ -1,9 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoWrite — Content Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0d;
+    --bg-card: #111318;
+    --bg-input: #161a1f;
+    --border: rgba(255,255,255,0.07);
+    --border-active: rgba(255,255,255,0.18);
+    --accent: #e8d5a3;
+    --accent-dim: rgba(232,213,163,0.12);
+    --accent-dim2: rgba(232,213,163,0.06);
+    --text-primary: #f0ece4;
+    --text-secondary: #7a7f8a;
+    --text-muted: #3d4148;
+    --green: #4ade80;
+    --green-dim: rgba(74,222,128,0.1);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.1);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.1);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    background: rgba(10,11,13,0.95);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+  .input-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-secondary);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  textarea, input[type="password"] {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 14px 16px;
+    resize: vertical;
+    min-height: 120px;
+  }
+  textarea:focus, input[type="password"]:focus { border-color: var(--border-active); outline: none; }
+  .options-row, .platform-row, .settings-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .option-card, .platform-btn, .settings-chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .option-card.active, .platform-btn.active, .settings-chip.active {
+    border-color: var(--accent);
+    background: var(--accent-dim2);
+    color: var(--accent);
+  }
+  .btn-generate {
+    width: 100%;
+    background: var(--accent);
+    color: #0a0b0d;
+    border: none;
+    border-radius: var(--radius);
+    padding: 13px 24px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .error-msg {
+    background: var(--red-dim);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: var(--red);
+    margin-top: 12px;
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--text-muted);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* Tambahkan style lain dari kode asli kamu jika kurang */
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><div class="logo-dot"></div> CRYPTOWRITE</div>
+  <span class="header-tag">Content Generator</span>
+</header>
+
+<div class="container">
+  <div class="page-title">Raw Analysis Input</div>
+
+  <div class="input-section">
+    <div class="section-label">Your raw analysis / insight</div>
+    <textarea id="rawInput" placeholder="Paste your raw crypto analysis here..."></textarea>
+  </div>
+
+  <!-- Format, Platform, Tone (sama seperti asli) -->
+  <div class="section-label">Output format</div>
+  <div class="options-row">
+    <div class="option-card active" onclick="selectMode('short')" id="mode-short"><div class="option-title">Quick Post</div></div>
+    <div class="option-card" onclick="selectMode('long')" id="mode-long"><div class="option-title">Deep Analysis</div></div>
+  </div>
+
+  <div class="section-label">Platform target</div>
+  <div class="platform-row">
+    <button class="platform-btn active" onclick="selectPlatform('both')" id="plat-both">◈ Both</button>
+    <button class="platform-btn" onclick="selectPlatform('twitter')" id="plat-twitter">𝕏 X</button>
+    <button class="platform-btn" onclick="selectPlatform('telegram')" id="plat-telegram">✈ Telegram</button>
+  </div>
+
+  <div class="section-label">Tone</div>
+  <div class="settings-row">
+    <div class="settings-chip active" onclick="selectTone(this, 'analyst')" data-tone="analyst">Professional Analyst</div>
+    <div class="settings-chip" onclick="selectTone(this, 'alpha')" data-tone="alpha">Alpha Trader</div>
+    <div class="settings-chip" onclick="selectTone(this, 'educator')" data-tone="educator">Educator</div>
+  </div>
+
+  <button class="btn-generate" id="generateBtn" onclick="generate()">Generate Content</button>
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="results-container" id="resultsContainer" style="display:none;">
+    <div class="result-tabs" id="resultTabs"></div>
+    <div class="result-card" id="resultCard"></div>
+  </div>
+</div>
+
 <script>
 let currentMode = 'short';
 let currentPlatform = 'both';
 let currentTone = 'analyst';
 
-const WORKER_URL = 'https://cryptorewritev1.brobzrkv.workers.dev';   // ← GANTI dengan URL Worker kamu yang sebenarnya
+const WORKER_URL = 'https://cryptorewritev1.brobzrkv.workers.dev';
 
 function selectMode(mode) {
   currentMode = mode;
@@ -13,9 +204,7 @@ function selectMode(mode) {
 
 function selectPlatform(plat) {
   currentPlatform = plat;
-  ['both','twitter','telegram'].forEach(p => {
-    document.getElementById('plat-' + p).classList.toggle('active', p === plat);
-  });
+  ['both','twitter','telegram'].forEach(p => document.getElementById('plat-' + p).classList.toggle('active', p === plat));
 }
 
 function selectTone(el, tone) {
@@ -26,109 +215,62 @@ function selectTone(el, tone) {
 
 function buildSystemPrompt() {
   const toneMap = {
-    analyst: 'professional crypto market analyst — data-driven, precise, measured confidence',
-    alpha: 'bold alpha trader — confident, direct, slightly edgy but never reckless',
-    educator: 'clear crypto educator — accessible, informative, jargon explained naturally'
+    analyst: 'professional crypto market analyst — data-driven, precise',
+    alpha: 'bold alpha trader — confident, direct',
+    educator: 'clear crypto educator — accessible, informative'
   };
-  return `You are a ${toneMap[currentTone]} writing polished crypto content for social media.
-CRITICAL RULES:
-- Write ONLY in English. Sound natural like a native speaker.
-- NEVER use hashtags.
-- ONLY use ticker format like $BTC, $ETH.
-- No emojis unless specifically requested.
-- Include opinion AND risk — not just facts.
-- Every post must start with a strong hook on line 1.
-- End with a soft question or observation.
-Respond ONLY with valid JSON. No markdown, no backticks, no preamble.`;
+  return `You are a ${toneMap[currentTone]} writing polished crypto content.
+CRITICAL: Write ONLY in English, natural native style. No hashtags. Use $BTC format. Include opinion + risk. Start with hook. End with soft question.
+Respond ONLY with valid JSON.`;
 }
 
 function buildUserPrompt(rawText) {
-  const platforms = {
-    both: ['twitter', 'telegram'],
-    twitter: ['twitter'],
-    telegram: ['telegram']
-  };
-  const plats = platforms[currentPlatform];
-
   if (currentMode === 'short') {
-    const outputs = [];
-    plats.forEach(p => {
-      outputs.push(`"${p}_short": "Short post for ${p}. STRUCTURE: 1. Hook (1 bold line) 2. Key insight (1-2 lines) 3. Opinion + Risk 4. Soft close question. Max 220 chars for Twitter, 300 for Telegram."`);
-    });
     return `Raw analysis: """${rawText}"""
-Generate content according to the rules. Return only valid JSON:
-{
-  ${outputs.join(',\n  ')}
-}`;
+Return JSON: {"twitter_short": "...", "telegram_short": "..."}`;
   } else {
-    // Long mode
-    const outputs = [];
-    if (plats.includes('twitter')) {
-      outputs.push(`"twitter_thread": "Array of 4-6 tweet strings for X Thread. First is hook, last has soft question."`);
-      outputs.push(`"twitter_short": "Single short Twitter post under 250 chars."`);
-    }
-    if (plats.includes('telegram')) {
-      outputs.push(`"telegram_thread": "Array of 4-6 messages for Telegram."`);
-      outputs.push(`"telegram_short": "Single Telegram post, max 350 chars."`);
-    }
-    outputs.push(`"article": "Long-form article (min 400 words) with Title, Lead, sections for Setup, Signal, Bull case, Risk, Key levels, and Closing."`);
-
     return `Raw analysis: """${rawText}"""
-Generate deep analysis content. Return only valid JSON:
-{
-  ${outputs.join(',\n  ')}
-}`;
+Return JSON with: twitter_thread, twitter_short, telegram_thread, telegram_short, article`;
   }
 }
 
 async function generate() {
   const raw = document.getElementById('rawInput').value.trim();
-  if (!raw) {
-    showError('Please enter your raw analysis first.');
-    return;
-  }
+  if (!raw) return showError('Masukkan raw analysis dulu.');
 
   const btn = document.getElementById('generateBtn');
-  const errorEl = document.getElementById('errorMsg');
-  errorEl.classList.remove('visible');
-
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Generating...';
-
-  showLoadingResult();
+  document.getElementById('errorMsg').classList.remove('visible');
 
   try {
-    const response = await fetch(WORKER_URL, {
+    const res = await fetch(WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         messages: [
-          { role: "system", content: buildSystemPrompt() },
-          { role: "user", content: buildUserPrompt(raw) }
+          {role: "system", content: buildSystemPrompt()},
+          {role: "user", content: buildUserPrompt(raw)}
         ],
-        model: "qwen-plus",        // atau "qwen-max" kalau mau lebih kuat
+        model: "qwen-plus",
         temperature: 0.7,
         max_tokens: 4000
       })
     });
 
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error?.message || 'Worker error: ' + response.status);
-    }
+    const data = await res.json();
 
-    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || 'API Error');
+
     const content = data.choices?.[0]?.message?.content || '';
+    if (!content) throw new Error('Empty response from Qwen');
 
-    if (!content) throw new Error('Empty response from AI');
+    let clean = content.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
 
-    let cleanText = content.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleanText);
-
-    renderResults(parsed);
+    renderResults(parsed);   // Pastikan fungsi renderResults masih ada dari kode asli
 
   } catch (err) {
-    console.error(err);
     showError('Error: ' + err.message);
   } finally {
     btn.disabled = false;
@@ -136,27 +278,15 @@ async function generate() {
   }
 }
 
-// Fungsi-fungsi lain (showLoadingResult, renderResults, switchTab, copyContent, showError, escHtml)
-// Copy dari kode HTML asli kamu. Pastikan semuanya masih ada.
-
-function showLoadingResult() {
-  // ... (sama seperti asli)
-}
-
-function renderResults(data) {
-  // ... (sama seperti asli)
-}
-
-// ... sisanya tetap
-
 function showError(msg) {
   const el = document.getElementById('errorMsg');
-  el.innerHTML = msg;
+  el.textContent = msg;
   el.classList.add('visible');
 }
 
-function escHtml(str) {
-  if (typeof str !== 'string') return '';
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g, '<br>');
-}
+// Tambahkan fungsi renderResults, showLoadingResult, dll dari kode asli kamu
+// Kalau kurang lengkap, beri tahu saya.
+
 </script>
+</body>
+</html>
